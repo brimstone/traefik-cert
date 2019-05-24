@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"bytes"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -105,6 +106,7 @@ to quickly create a Cobra application.`,
 		go func() {
 			for {
 				killChild := true
+				certSig := cert.Signature
 				delay := cert.NotAfter.Sub(time.Now())
 				log.Println("Cert expires in", delay)
 				if delay > time.Hour*24 {
@@ -117,6 +119,9 @@ to quickly create a Cobra application.`,
 				cert, err = getValidCert(0, cmd)
 				if err != nil {
 					return
+				}
+				if bytes.Equal(certSig, cert.Signature) {
+					killChild = false
 				}
 				if killChild {
 					restartChild = true
