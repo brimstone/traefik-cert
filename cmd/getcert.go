@@ -4,6 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"os"
+	"os/user"
+	"strconv"
+	"strings"
 
 	"github.com/brimstone/traefik-cert/client"
 	"github.com/spf13/cobra"
@@ -51,6 +55,10 @@ func initgetcertFlags() {
 	getcertFlags.StringP("key", "k", "", "Path to save key file [$KEY]")
 	viper.BindPFlag("key", getcertFlags.Lookup("key"))
 	viper.BindEnv("key")
+
+	getcertFlags.StringP("owner", "o", "", "Owner and optional group for files [$KEY]")
+	viper.BindPFlag("owner", getcertFlags.Lookup("owner"))
+	viper.BindEnv("owner")
 }
 
 func init() {
@@ -100,6 +108,71 @@ func getcertFunc(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	ownerFlag := viper.GetString("owner")
+	if ownerFlag == "" {
+		return nil
+	}
+
+	var owner *user.User
+
+	ownergroup := strings.Split(ownerFlag, ":")
+	if len(ownergroup) > 2 {
+		return errors.New("Only one colon allowed in owner flag")
+	}
+
+	ownerID, err := strconv.ParseInt(ownergroup[0], 10, 10)
+	if err != nil {
+		owner, err = user.Lookup(ownergroup[0])
+		if err != nil {
+			return err
+		}
+		ownerID, err = strconv.ParseInt(owner.Uid, 10, 10)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = os.Chown(certfile, int(ownerID), -1)
+	if err != nil {
+		return err
+	}
+	err = os.Chown(keyfile, int(ownerID), -1)
+	if err != nil {
+		return err
+	}
+
+	if len(ownergroup) == 1 {
+		// Don't change the group
+		return nil
+	}
+
+	var ownerGID int64
+	// Set the default group for the user
+	if ownergroup[1] == "" {
+		ownerGID, err = strconv.ParseInt(owner.Gid, 10, 10)
+	} else {
+		ownerGID, err = strconv.ParseInt(ownergroup[1], 10, 10)
+		if err != nil {
+			group, err := user.LookupGroup(ownergroup[1])
+			if err != nil {
+				return err
+			}
+			ownerGID, err = strconv.ParseInt(group.Gid, 10, 10)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	err = os.Chown(certfile, -1, int(ownerGID))
+	if err != nil {
+		return err
+	}
+	err = os.Chown(keyfile, -1, int(ownerGID))
+	if err != nil {
+		return err
 	}
 
 	return nil

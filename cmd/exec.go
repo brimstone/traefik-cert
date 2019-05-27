@@ -27,6 +27,7 @@ import (
 	"math/big"
 	"os"
 	"os/exec"
+	"strings"
 	"syscall"
 	"time"
 
@@ -133,6 +134,12 @@ to quickly create a Cobra application.`,
 		for {
 			restartChild = false
 			child = exec.Command(args[0], args[1:]...)
+			for _, e := range os.Environ() {
+				if strings.HasPrefix(e, "JWT=") {
+					continue
+				}
+				child.Env = append(child.Env, e)
+			}
 			child.Stdin = os.Stdin
 			child.Stdout = os.Stdout
 			child.Stderr = os.Stderr
