@@ -138,7 +138,8 @@ to quickly create a Cobra application.`,
 			child.Stderr = os.Stderr
 			log.Println("Starting child")
 			err = child.Run()
-			log.Printf("Command finished with error: %v", err)
+			exitcode := child.ProcessState.ExitCode()
+			log.Printf("Command finished with error(%d): %s", exitcode, err)
 			if !restartChild {
 				break
 			}

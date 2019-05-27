@@ -80,6 +80,10 @@ func getcertFunc(cmd *cobra.Command, args []string) error {
 
 	cert, key, err := client.GetCert(url, domain, jwt)
 
+	if err != nil {
+		return err
+	}
+
 	if certfile == "" {
 		fmt.Println(string(cert))
 	} else {
