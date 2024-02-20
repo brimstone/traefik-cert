@@ -31,3 +31,7 @@ serverloop:
 .PHONY: traefik
 traefik:
 	docker run --rm --name traefik -it -v /tmp/acme:/acme -p 80:80 -p 443:443 -v /var/run/docker.sock:/var/run/docker.sock traefik --entryPoints='Name:https Address::443 TLS' --entryPoints='Name:http Address::80 Redirect.EntryPoint:https' --defaultEntryPoints='http,https' --acme.httpChallenge.entryPoint=http --acme.acmeLogging=true --acme.entryPoint=https --acme.storage=/acme/acme.json --acme.onhostrule --docker --docker.watch --loglevel=info --web
+
+.PHONY: image
+image:
+	docker buildx build --pull --platform=linux/arm64,linux/amd64 --push -t brimstone/traefik-cert .

@@ -1,5 +1,5 @@
 ARG PACKAGE=github.com/brimstone/traefik-cert
-FROM brimstone/golang:1.12 as builder
+FROM brimstone/golang:latest-onbuild as builder
 
 FROM scratch
 ENV ADDRESS= \
