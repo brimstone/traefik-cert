@@ -109,6 +109,10 @@ func getcertFunc(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	if cert == "" {
+		return errors.New("No cert in response from server")
+	}
+
 	if certfile == "" {
 		fmt.Println(string(cert))
 	} else {

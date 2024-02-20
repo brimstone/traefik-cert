@@ -42,7 +42,7 @@ import (
 
 func mkCert(certfile string) {
 	template := &x509.Certificate{
-		IsCA: true,
+		IsCA:                  true,
 		BasicConstraintsValid: true,
 		SubjectKeyId:          []byte{1, 2, 3},
 		SerialNumber:          big.NewInt(1234),
@@ -162,7 +162,7 @@ to quickly create a Cobra application.`,
 
 func getValidCert(tries int, cmd *cobra.Command) (*x509.Certificate, error) {
 	certfile := viper.GetString("cert")
-	if tries > 1 {
+	if tries > 2 {
 		return nil, errors.New("Too many tries")
 	} else if tries == 0 {
 		//mkCert(certfile)
