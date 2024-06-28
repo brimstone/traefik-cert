@@ -6,7 +6,7 @@ require (
 	github.com/brimstone/jwt v0.0.0-20180624143910-4b2823fc8c64
 	github.com/brimstone/logger v0.0.0-20220623184533-a0bc3dcb2ed6
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/spf13/cobra v1.8.0
+	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.19.0
 )
